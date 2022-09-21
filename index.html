@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="description" content=" A media app built using javascript" />
+    <base href="/index.html">
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+    
+    <link rel="stylesheet" href="css/bootstrap.css" />
+        <link rel="stylesheet" href="css/main.css" />
+    
+    
+    <script type="text/javascript" src="js/bootstrap.js"></script>
+    
+    
+        <script type="text/javascript" src="/jquery-3.1.0.min.js"></script>
+       
+  </head>
+
+  <body>
+  <header class="top">
+    
+    <h2 id="head">Social Diary</h2>
+    
+    
+    <ul id="smenu" class="nav navbar-nav navbar-right">
+      <li class="dropdown"><a href="#" id="drop" class="dropdown-toggle" data-toggle="dropdown">Menu</a>
+      <ul class="dropdown-menu nav-justified"> 
+      <li class="nav-item "><a id="home" class="nav-link" href="#jumbo">Home</a></li>
+      
+      <li class="nav-item"><a id="vpost" class="nav-link" href="#viewpost">Posts</a>
+      </li>
+    
+    <li class="nav-item "><a class="nav-link " id="adpost" href="#postinput">Add Post</a>
+    </li>
+    
+    <li class=" nav-item"><a class="nav-link " id="signup" href="#login">Sign Up</a></li></ul></li></ul>
+    
+<ul id="lgmenu" class="nav nav-pills">
+      <li class="navbar-brand " ><a class=" " id="home2" href="#jumbo">Home</a></li>
+      <li class="navbar-brand"><a class=" " id="vpost2" href="#viewpost">Posts</a></li>
+    
+    <li class="navbar-brand"><a class=" " id="apost" href="#postinput">Add Post</a>
+    </li>
+    
+    <li class="navbar-brand"><a class=" " id="signup2" href="#login">Sign Up</a></li></ul>
+    </header>
+    
+    <div class ="alert alert-dismissable" id="msg">
+      
+    </div>
+    <div id="jumbo" class="jumbotron">
+       <div class="container-fluid">
+      <article id="landing" class=" text-center"><p>Welcome to your Social Personal Diary Application. Use this app to curate you thought, share with friends or followers. </p>
+      <p>To start using this app create a unique username and password to keep your diary from unauthorised access. Click the button below to get started</p>
+   
+      </article>
+   <div id="dbutton"> <button class="btn btn-primary btn-md  "  id="start">Get Started</button>
+   </div>
+   </div>
+   </div>
+      <div class="container-fluid"><div id="login" class=" ">
+    
+      <form id="account" class="form-horizontal" role="form">
+        <div class="form-group">
+          <label class=" col-sm-2 control-label" for="email">Email</label>
+       
+       
+          <input type="email" name="email" id="email"
+        class="form-control" />
+        
+        </div>
+        
+        <div class="form-group">
+          <label class=" col-sm-2 control-label" for="password">Password</label>
+          
+        
+          <input type="password" name="password" id="password"
+        class="form-control" />
+        
+        </div>
+        <div id="dbutton">
+        <button id="creatacct" class="btn btn-primary btn-md " type="Submit" >Submit</button>
+        </div>
+        </form>
+    </div>
+    
+    
+      <div id="postinput" class="">
+        
+        <form class="form-horizontal " role="form" id="form">
+      <div class="form-group">
+          <label for="title">Title</label>
+          
+         <input class="form-control" id="title" type="text" width="40" />
+          </div>
+          <div class="form-group " >
+            <label for="content">Content</label>
+          
+          <textarea class="form-control" id="text" cols="25" rows="10"></textarea>
+          </div>
+       <div id="dbutton">
+         <button  class="btn btn-primary btn-md"  type="submit ">Submit Post</button> 
+         </div>
+        </form>
+        
+      </div>
+      
+
+      <div id="viewpost" class="view">
+        <h3>Recent Post</h3>
+         
+        <div class="" id="posts">
+     
+        </div>
+        
+      <div id="dbutton"  >
+         <button id="addpost" class="btn btn-primary btn-md ">Add Post</button>
+    </div>
+      </div>
+   
+    </div>
+    <footer>
+      
+    </footer>
+    
+    <script type="module">
+    import {insertData,getData,getAllData,delData} from "/js/app.js";
+   let logFeedBack=function(type,info){
+     $(".alert").addClass(type).html(`<p>${info}</p>`);
+   }
+    console.log("inside imported mod");
+      if(!(window.indexedDB)){
+  console.log("IndexDB not supported");
+   
+}
+else{
+  console.log("indexedDB supported");
+}
+    let diarymap=[];
+    
+  let request=window.indexedDB.open("sdiary",1);
+request.onerror=function(event){
+  
+  console.error(event);
+}
+request.onupgradeneeded=(event)=> {
+  let db=request.result;
+  let store= db.createObjectStore("posts",{autoIncrement:true});
+  let index=store.createIndex("title","title",{unique:true});
+};
+    
+    let locData={ };
+    
+    $(function (){
+      console.log("dom ready");
+      $("#form").submit(function(event){
+        event.preventDefault();
+        let title=$("#title").val();
+        let text=$("#text").val();
+        if(title===""){
+          $("#msg").html("<p>Title cannot be blank</p>");
+          console.log("title validation failed");
+        }
+        else if( text===""){
+          console.log("text validation failed");
+        }
+     
+        else {
+        locData={"title":title.toString(),"text":text.toString(),"date":Date().toString()}
+        console.log(locData);
+        let dataRequest=window.indexedDB.open("sdiary",1);
+        dataRequest.onsuccess=(event)=>{
+          let db=event.target.result;
+          insertData(db,locData);
+          console.log("data successful submitted");
+          $(".alert").addClass(".alert-success").html("<p>Data Successfully Sumbmitted");
+        };
+        dataRequest.onerror=(event)=>{
+          console.error(event);
+        }
+        }
+        });
+    
+      
+      
+    });
+    
+   const navigator=function(i){
+     
+     $(i).hide();
+   };
+   
+   const acctHide=["#viewpost","#jumbo","#postinput"];
+   
+   $("#signup").click(function(event){
+     $("#login").toggle();
+     acctHide.map((ele)=>{
+       navigator(ele);
+     });
+   })
+   
+      function action(selector,event,sparent,target){
+        $(selector).on(event,function(e){
+      e.preventDefault();
+          $(sparent).toggle();
+          $(target).toggle();
+        });
+      };
+      action("#start","click","#login","#jumbo");
+      action("#account","submit","#viewpost","#login")
+   action("#addpost","click","#postinput","#viewpost");
+   
+ $("#drop").click(function(event){
+   $(".dropdown-menu").toggle();
+ }) ; 
+ const postHide=["#jumbo","#login","#postinput"];
+ $("#vpost").click(function(event){
+   $("#viewpost").toggle();
+   postHide.map((ele)=>{
+     navigator(ele);
+   })
+ })
+const jumboHide=["#viewpost","#login","#postinput"];
+ $("#home").click(function(event){
+   $("#jumbo").toggle();
+   jumboHide.map((ele)=>{
+     navigator(ele);
+   })
+ });
+ 
+const adHide=["#jumbo","#login","#viewpost"];
+ $("#adpost").click(function(event){
+   $("#postinput").toggle();
+   adHide.map((ele)=>{
+     navigator(ele);
+   })
+ });
+const postHide2=["#jumbo","#login","#postinput"];
+ $("#vpost2").click(function(event){
+   $("#viewpost").toggle();
+   postHide2.map((ele)=>{
+     navigator(ele);
+   })
+ })
+
+const adHide2=["#jumbo","#login","#viewpost"];
+ $("#apost").click(function(event){
+   console.log("inside add post2");
+   $("#postinput").toggle();
+   adHide2.map((ele)=>{
+     navigator(ele);
+   })
+ });
+const jumboHide2=["#viewpost","#login","#postinput"];
+ $("#home2").click(function(event){
+   $("#jumbo").toggle();
+   jumboHide2.map((ele)=>{
+     navigator(ele);
+   })
+ })
+
+const loginHide2=["#jumbo","#viewpost","#postinput"];
+ $("#signup2").click(function(event){
+   $("#login").toggle();
+   loginHide2.map((ele)=>{
+     navigator(ele);
+   })
+ })
+
+ 
+ 
+   ;(function (e){
+      let getRequest=window.indexedDB.open("sdiary",1);
+      getRequest.onsuccess=(event)=>{
+        let db=event.target.result;
+let tnx=db.transaction("posts","readonly");
+    let store=tnx.objectStore("posts");
+    store.openCursor().onsuccess=(event)=> {
+     
+     let cursor=event.target.result;
+     if(cursor){
+       let date=new Date(cursor.value.date);
+       let postdate=date.toDateString();
+     $("#posts").append(`
+        <div id=${cursor.primaryKey} class="dipost "><a href=" ">${cursor.value.title}</a><span><small>Posted</small></span> <span><small>${postdate}</small></span>
+        </div>`);
+        
+      cursor.continue();
+      
+     }
+    }
+    
+   tnx.oncomplete=()=>db.close();
+};
+      })()
+    
+      
+      
+    
+  
+  
+   </script>
+   
+  </body>
+</html>
